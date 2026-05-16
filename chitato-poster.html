@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chitato — Poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Chakra+Petch:wght@300;400;600;700&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Chakra Petch', sans-serif;
+  }
+
+  /* ─── POSTER SHELL ─── */
+  .poster {
+    position: relative;
+    width: 800px;
+    height: 1130px;
+    overflow: hidden;
+    background: #0a0a0a;
+    border-radius: 4px;
+    box-shadow: 0 40px 120px rgba(0,0,0,.9);
+  }
+
+  /* ─── BACKGROUND LAYERS ─── */
+  .bg-gradient {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 60% 30%, rgba(220,40,20,.35) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 15% 70%, rgba(255,140,0,.22) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(180,0,0,.30) 0%, transparent 70%),
+      linear-gradient(160deg, #1a0800 0%, #0d0208 40%, #050010 100%);
+    z-index: 0;
+  }
+
+  /* noise texture overlay */
+  .bg-noise {
+    position: absolute; inset: 0; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: .035;
+  }
+
+  /* ─── GEOMETRIC DECO SHAPES ─── */
+  .deco { position: absolute; z-index: 2; }
+
+  /* large tilted slab top-left */
+  .deco-slab-tl {
+    top: -60px; left: -80px;
+    width: 340px; height: 340px;
+    background: linear-gradient(135deg, #e8210a 0%, #ff6000 100%);
+    transform: rotate(-28deg);
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+    opacity: .18;
+    filter: blur(1px);
+  }
+
+  /* diagonal stripe band across right side */
+  .deco-stripe-r {
+    top: 0; right: -30px;
+    width: 120px; height: 100%;
+    background: repeating-linear-gradient(
+      -55deg,
+      rgba(255,90,0,.12) 0px,
+      rgba(255,90,0,.12) 4px,
+      transparent 4px,
+      transparent 22px
+    );
+  }
+
+  /* circular halo behind model area */
+  .deco-halo {
+    top: 80px; left: 50%;
+    transform: translateX(-50%);
+    width: 640px; height: 640px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,60,0,.13) 0%, transparent 70%);
+    border: 1px solid rgba(255,80,10,.12);
+  }
+
+  /* bottom accent arc */
+  .deco-arc {
+    bottom: -160px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 360px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,100,0,.25);
+    box-shadow: 0 0 60px rgba(255,60,0,.15);
+  }
+
+  /* floating dot grid top-right */
+  .deco-dots {
+    top: 30px; right: 30px;
+    width: 130px; height: 130px;
+    background-image: radial-gradient(circle, rgba(255,140,0,.45) 1.5px, transparent 1.5px);
+    background-size: 14px 14px;
+    opacity: .6;
+  }
+
+  /* angled accent lines bottom-left */
+  .deco-lines-bl {
+    bottom: 160px; left: 0;
+    width: 180px; height: 180px;
+    background-image: repeating-linear-gradient(
+      40deg,
+      rgba(220,40,0,.3) 0px,
+      rgba(220,40,0,.3) 1.5px,
+      transparent 1.5px,
+      transparent 18px
+    );
+    clip-path: polygon(0 0, 100% 0, 60% 100%, 0 100%);
+  }
+
+  /* small triangle accent top-center */
+  .deco-tri {
+    top: 30px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 48px solid rgba(255,90,0,.22);
+  }
+
+  /* glowing chip silhouettes — floating */
+  .chip { position: absolute; z-index: 3; opacity: .55; }
+
+  /* ─── HEADER BAND ─── */
+  .header-band {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 36px 18px;
+    background: linear-gradient(180deg, rgba(0,0,0,.7) 0%, transparent 100%);
+  }
+
+  .brand-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-badge-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, #e8210a, #ff6d00);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 18px rgba(232,33,10,.6);
+  }
+  .brand-badge-icon svg { width: 26px; height: 26px; }
+  .brand-name-small {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255,80,0,.5);
+  }
+
+  .header-tag {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: rgba(255,140,0,.85);
+    text-transform: uppercase;
+    border: 1px solid rgba(255,140,0,.35);
+    padding: 5px 12px;
+    border-radius: 2px;
+  }
+
+  /* ─── FLAVOR LABEL RIBBON ─── */
+  .flavor-ribbon {
+    position: absolute;
+    top: 88px; left: 0;
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .flavor-ribbon-inner {
+    background: linear-gradient(90deg, #e8210a 0%, #ff4500 60%, transparent 100%);
+    padding: 7px 48px 7px 36px;
+    display: flex; align-items: center; gap: 12px;
+    clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+  }
+  .flavor-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 6px #fff;
+  }
+  .flavor-text {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  /* ─── MODEL FIGURE (CSS art) ─── */
+  .model-wrap {
+    position: absolute;
+    bottom: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 520px;
+    height: 720px;
+    z-index: 5;
+  }
+
+  /* cinematic light shaft behind model */
+  .model-wrap::before {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 50%;
+    transform: translateX(-50%);
+    width: 300px; height: 700px;
+    background: linear-gradient(180deg, rgba(255,70,0,.18) 0%, rgba(255,140,0,.08) 50%, transparent 100%);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+    filter: blur(18px);
+    z-index: 0;
+  }
+
+  /* ground glow */
+  .model-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; left: 50%;
+    transform: translateX(-50%);
+    width: 360px; height: 40px;
+    background: radial-gradient(ellipse, rgba(255,80,0,.5) 0%, transparent 70%);
+    filter: blur(10px);
+    z-index: 0;
+  }
+
+  .model-svg {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 30px rgba(255,60,0,.4)) drop-shadow(0 0 80px rgba(255,100,0,.2));
+  }
+
+  /* ─── MAIN HEADLINE ─── */
+  .headline-wrap {
+    position: absolute;
+    top: 130px; left: 0; right: 0;
+    z-index: 12;
+    text-align: center;
+    padding: 0 36px;
+  }
+
+  .headline-eyebrow {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255,140,0,.9);
+    margin-bottom: 6px;
+  }
+
+  .headline-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 110px;
+    line-height: .9;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow:
+      0 0 40px rgba(255,60,0,.6),
+      0 0 80px rgba(255,40,0,.3),
+      4px 4px 0 rgba(200,20,0,.4);
+    position: relative;
+  }
+
+  /* outline stroke text layer */
+  .headline-main .outline {
+    -webkit-text-stroke: 2px rgba(255,100,0,.6);
+    color: transparent;
+    position: absolute;
+    inset: 0;
+    letter-spacing: 4px;
+    font-size: 110px;
+    line-height: .9;
+    transform: translate(3px, 3px);
+  }
+
+  .headline-sub {
+    font-family: 'Russo One', sans-serif;
+    font-size: 28px;
+    letter-spacing: 12px;
+    color: rgba(255,255,255,.9);
+    text-transform: uppercase;
+    margin-top: 10px;
+    text-shadow: 0 0 20px rgba(255,80,0,.5);
+  }
+
+  /* ─── BADGE / FLAVOR CALLOUT ─── */
+  .flavor-callout {
+    position: absolute;
+    top: 360px; right: 30px;
+    z-index: 15;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #e8210a, #ff6d00, #ffb300, #e8210a);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(232,33,10,.6), 0 0 60px rgba(255,100,0,.3);
+    animation: spin-badge 12s linear infinite;
+  }
+  @keyframes spin-badge {
+    from { box-shadow: 0 0 30px rgba(232,33,10,.6), 0 0 60px rgba(255,100,0,.3); }
+    50%  { box-shadow: 0 0 50px rgba(232,33,10,.9), 0 0 100px rgba(255,100,0,.5); }
+    to   { box-shadow: 0 0 30px rgba(232,33,10,.6), 0 0 60px rgba(255,100,0,.3); }
+  }
+  .callout-inner {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: #0d0208;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border: 1.5px solid rgba(255,140,0,.4);
+  }
+  .callout-label {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,180,0,.9);
+  }
+  .callout-flavor {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  /* left badge */
+  .star-badge {
+    position: absolute;
+    top: 370px; left: 30px;
+    z-index: 15;
+    width: 84px; height: 84px;
+  }
+  .star-badge svg { width: 84px; height: 84px; }
+
+  /* ─── PRODUCT CHIP GRAPHIC ─── */
+  .chip-graphic {
+    position: absolute;
+    bottom: 265px;
+    right: -30px;
+    z-index: 14;
+    width: 220px;
+    transform: rotate(-18deg);
+    filter: drop-shadow(0 10px 30px rgba(255,80,0,.5));
+    animation: float-chip 3.5s ease-in-out infinite;
+  }
+  @keyframes float-chip {
+    0%, 100% { transform: rotate(-18deg) translateY(0); }
+    50%       { transform: rotate(-18deg) translateY(-12px); }
+  }
+
+  .chip-graphic-2 {
+    position: absolute;
+    bottom: 300px; left: -20px;
+    z-index: 14;
+    width: 170px;
+    transform: rotate(22deg) scaleX(-1);
+    filter: drop-shadow(0 10px 24px rgba(255,120,0,.4));
+    animation: float-chip2 4s ease-in-out infinite;
+  }
+  @keyframes float-chip2 {
+    0%, 100% { transform: rotate(22deg) scaleX(-1) translateY(0); }
+    50%       { transform: rotate(22deg) scaleX(-1) translateY(-8px); }
+  }
+
+  /* ─── PRODUCT INFO STRIP ─── */
+  .info-strip {
+    position: absolute;
+    bottom: 140px; left: 0; right: 0;
+    z-index: 12;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+  }
+  .info-item {
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 14px 28px;
+    border-right: 1px solid rgba(255,100,0,.25);
+  }
+  .info-item:last-child { border-right: none; }
+  .info-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    color: #ff6d00;
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(255,80,0,.5);
+  }
+  .info-label {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+    margin-top: 2px;
+  }
+
+  /* ─── SLOGAN + CTA BLOCK ─── */
+  .slogan-block {
+    position: absolute;
+    bottom: 60px; left: 0; right: 0;
+    z-index: 12;
+    text-align: center;
+    padding: 0 50px;
+  }
+
+  .slogan-line {
+    font-family: 'Russo One', sans-serif;
+    font-size: 19px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,.85);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    text-shadow: 0 0 14px rgba(255,60,0,.3);
+  }
+  .slogan-line span {
+    color: #ff6d00;
+    text-shadow: 0 0 16px rgba(255,80,0,.8);
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(90deg, #e8210a 0%, #ff6d00 100%);
+    border: none;
+    border-radius: 4px;
+    padding: 14px 38px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(232,33,10,.5), 0 0 0 1px rgba(255,120,0,.3);
+  }
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+    animation: shimmer 2.4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%   { left: -100%; }
+    60%  { left: 100%; }
+    100% { left: 100%; }
+  }
+  .cta-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,.3);
+  }
+  .cta-arrow {
+    width: 20px; height: 20px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  /* ─── BOTTOM BAR ─── */
+  .bottom-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, transparent 0%, #e8210a 25%, #ff6d00 50%, #ffb300 75%, transparent 100%);
+    z-index: 20;
+  }
+
+  /* ─── SCAN LINES subtle overlay ─── */
+  .scanlines {
+    position: absolute; inset: 0; z-index: 25;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,.03) 2px,
+      rgba(0,0,0,.03) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* ─── SIDE TYPOGRAPHY ─── */
+  .side-text-left {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: center;
+    z-index: 12;
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,100,0,.4);
+    white-space: nowrap;
+  }
+
+  .side-text-right {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: center;
+    z-index: 12;
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,100,0,.4);
+    white-space: nowrap;
+  }
+
+  /* corner marks */
+  .corner {
+    position: absolute;
+    z-index: 20;
+    width: 22px; height: 22px;
+    border-color: rgba(255,100,0,.45);
+    border-style: solid;
+  }
+  .corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 14px; left: 12px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 14px; right: 12px; border-width: 0 2px 2px 0; }
+
+  /* glow orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .orb-1 {
+    width: 400px; height: 400px;
+    background: rgba(220,30,10,.22);
+    top: -100px; right: -100px;
+  }
+  .orb-2 {
+    width: 300px; height: 300px;
+    background: rgba(255,100,0,.16);
+    bottom: 100px; left: -80px;
+  }
+  .orb-3 {
+    width: 200px; height: 200px;
+    background: rgba(255,180,0,.12);
+    top: 500px; right: 40px;
+  }
+</style>
+</head>
+<body>
+
+<div class="poster">
+
+  <!-- BG layers -->
+  <div class="bg-gradient"></div>
+  <div class="bg-noise"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Deco geometry -->
+  <div class="deco deco-slab-tl"></div>
+  <div class="deco deco-stripe-r"></div>
+  <div class="deco deco-halo"></div>
+  <div class="deco deco-arc"></div>
+  <div class="deco deco-dots"></div>
+  <div class="deco deco-lines-bl"></div>
+  <div class="deco deco-tri"></div>
+
+  <!-- Corner marks -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <!-- Side typography -->
+  <div class="side-text-left">BOLD FLAVOR — ORIGINAL TASTE — PREMIUM SNACK</div>
+  <div class="side-text-right">CRUNCHY · IRRESISTIBLE · CHITATO ©2025</div>
+
+  <!-- Header -->
+  <div class="header-band">
+    <div class="brand-badge">
+      <div class="brand-badge-icon">
+        <svg viewBox="0 0 26 26" fill="none">
+          <path d="M4 20 Q7 8 13 6 Q19 4 22 14 Q19 22 13 22 Q7 22 4 20Z" fill="white" opacity=".9"/>
+          <path d="M8 18 Q10 12 13 11 Q16 10 18 15" stroke="rgba(220,40,0,.7)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <span class="brand-name-small">CHITATO</span>
+    </div>
+    <div class="header-tag">PREMIUM EDITION</div>
+  </div>
+
+  <!-- Flavor ribbon -->
+  <div class="flavor-ribbon">
+    <div class="flavor-ribbon-inner">
+      <div class="flavor-dot"></div>
+      <span class="flavor-text">Beef Barbeque · Sapi Panggang · Original</span>
+    </div>
+  </div>
+
+  <!-- Main headline -->
+  <div class="headline-wrap">
+    <div class="headline-eyebrow">The Signature Indonesian Snack</div>
+    <div class="headline-main">
+      <span class="outline">CHITATO</span>
+      CHITATO
+    </div>
+    <div class="headline-sub">Feel the Crunch</div>
+  </div>
+
+  <!-- Model SVG illustration -->
+  <div class="model-wrap">
+    <svg class="model-svg" viewBox="0 0 520 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="skinGrad" cx="50%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="#c8845a"/>
+          <stop offset="100%" stop-color="#8a4c2a"/>
+        </radialGradient>
+        <radialGradient id="skinGrad2" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#d49068"/>
+          <stop offset="100%" stop-color="#9a5c38"/>
+        </radialGradient>
+        <linearGradient id="jacketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1a0a00"/>
+          <stop offset="40%" stop-color="#2d1200"/>
+          <stop offset="100%" stop-color="#0a0000"/>
+        </linearGradient>
+        <linearGradient id="jacketAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e8210a"/>
+          <stop offset="100%" stop-color="#ff6d00"/>
+        </linearGradient>
+        <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="60%" y2="100%">
+          <stop offset="0%" stop-color="#fff5e0"/>
+          <stop offset="100%" stop-color="#ffe0b0"/>
+        </linearGradient>
+        <linearGradient id="jeansGrad" x1="0%" y1="0%" x2="30%" y2="100%">
+          <stop offset="0%" stop-color="#1a2a4a"/>
+          <stop offset="50%" stop-color="#0d1a35"/>
+          <stop offset="100%" stop-color="#080e20"/>
+        </linearGradient>
+        <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1a0800"/>
+          <stop offset="100%" stop-color="#3d1800"/>
+        </linearGradient>
+        <linearGradient id="lightL" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="rgba(255,100,30,0.25)"/>
+          <stop offset="100%" stop-color="rgba(255,100,30,0)"/>
+        </linearGradient>
+        <linearGradient id="lightR" x1="100%" y1="0%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="rgba(255,160,80,0.12)"/>
+          <stop offset="100%" stop-color="rgba(255,160,80,0)"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="softGlow">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <clipPath id="posterClip">
+          <rect width="520" height="720"/>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#posterClip)">
+
+        <!-- Shadow under feet -->
+        <ellipse cx="260" cy="710" rx="130" ry="14" fill="rgba(0,0,0,0.5)" filter="url(#softGlow)"/>
+
+        <!-- ── SHOES ── -->
+        <!-- Left shoe -->
+        <path d="M185 672 Q175 668 168 672 Q158 676 162 684 Q166 692 180 692 Q202 694 215 688 L218 676 Z" fill="#0a0a0a"/>
+        <path d="M162 684 Q168 692 180 692 Q198 692 212 687 L215 688 Q202 694 180 692 Q166 692 162 684Z" fill="#1a1a1a"/>
+        <!-- sole highlight -->
+        <path d="M168 684 Q175 680 185 682 L188 686 Q178 688 168 684Z" fill="rgba(255,100,0,0.3)"/>
+        <!-- Right shoe -->
+        <path d="M298 665 Q306 660 316 662 Q330 664 334 672 Q338 680 326 684 Q308 688 292 684 L288 672 Z" fill="#0a0a0a"/>
+        <path d="M334 672 Q330 680 318 684 Q306 688 292 684 L290 682 Q306 688 320 682 Q334 676 334 672Z" fill="#1a1a1a"/>
+        <path d="M312 666 Q320 668 328 672 L322 678 Q316 672 312 666Z" fill="rgba(255,100,0,0.3)"/>
+
+        <!-- ── JEANS / LEGS ── -->
+        <!-- Left leg -->
+        <path d="M196 490 Q188 560 182 610 Q178 640 183 658 Q192 670 210 672 L222 670 Q220 655 218 638 Q214 604 210 572 L204 492Z" fill="url(#jeansGrad)"/>
+        <!-- right leg crease light -->
+        <path d="M200 492 Q198 540 196 580 Q194 610 196 638 L200 638 Q200 608 202 578 Q204 542 204 492Z" fill="rgba(255,255,255,0.06)"/>
+        <!-- Right leg -->
+        <path d="M310 490 Q316 558 320 608 Q324 640 320 658 Q312 670 296 672 L284 670 Q286 655 288 638 Q292 604 294 572 L302 492Z" fill="url(#jeansGrad)"/>
+        <path d="M306 492 Q308 538 310 578 Q312 608 310 638 L314 638 Q314 608 312 578 Q310 540 310 492Z" fill="rgba(255,255,255,0.06)"/>
+        <!-- Belt area -->
+        <path d="M192 488 L314 488 L312 498 L196 498Z" fill="#0d0a00"/>
+        <path d="M198 488 L308 488 L308 494 L198 494Z" fill="rgba(255,140,0,0.18)"/>
+        <!-- belt buckle -->
+        <rect x="248" y="488" width="20" height="12" rx="2" fill="#1a0800" stroke="rgba(255,140,0,0.5)" stroke-width="1"/>
+        <rect x="253" y="491" width="10" height="6" rx="1" fill="rgba(255,140,0,0.3)"/>
+
+        <!-- ── TORSO / JACKET ── -->
+        <!-- Jacket body -->
+        <path d="M168 360 Q155 390 150 430 Q145 470 148 490 Q160 498 200 498 L316 498 Q352 494 356 490 Q360 468 354 428 Q348 388 334 358 Q316 348 296 344 L260 340 L220 344 Q196 348 168 360Z" fill="url(#jacketGrad)"/>
+
+        <!-- Jacket red accent stripe left -->
+        <path d="M168 360 Q162 390 158 430 L162 430 Q166 390 172 362Z" fill="url(#jacketAccent)" opacity=".8"/>
+        <!-- Jacket red accent stripe right -->
+        <path d="M334 358 Q342 388 346 430 L342 430 Q338 388 330 360Z" fill="url(#jacketAccent)" opacity=".8"/>
+        <!-- Jacket lapels / collar -->
+        <path d="M220 344 Q212 354 208 368 Q220 372 260 372 Q300 372 312 368 Q308 354 298 344Z" fill="#2d1200"/>
+        <!-- Inner shirt visible at chest -->
+        <path d="M224 368 Q222 378 226 386 Q244 394 276 386 Q280 378 278 368Z" fill="url(#shirtGrad)"/>
+        <!-- jacket center seam -->
+        <path d="M260 368 L260 498" stroke="rgba(255,100,0,0.12)" stroke-width="1.5"/>
+        <!-- jacket highlight left -->
+        <path d="M168 360 Q160 390 158 430 L165 430 Q168 390 175 364Z" fill="url(#lightL)"/>
+        <!-- jacket highlight right -->
+        <path d="M334 358 Q342 388 346 430 L338 430 Q334 388 328 362Z" fill="url(#lightR)"/>
+
+        <!-- Jacket pockets -->
+        <path d="M170 420 Q170 414 178 414 L200 414 Q208 414 208 420 L208 436 Q208 440 200 440 L178 440 Q170 440 170 436Z" fill="rgba(0,0,0,0.3)" stroke="rgba(255,100,0,0.15)" stroke-width="1"/>
+        <path d="M318 420 Q318 414 310 414 L292 414 Q284 414 284 420 L284 436 Q284 440 292 440 L310 440 Q318 440 318 436Z" fill="rgba(0,0,0,0.3)" stroke="rgba(255,100,0,0.15)" stroke-width="1"/>
+
+        <!-- CHITATO logo patch on jacket left -->
+        <rect x="176" y="382" width="56" height="20" rx="3" fill="rgba(232,33,10,0.85)"/>
+        <text x="204" y="396" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="12" fill="white" letter-spacing="2">CHITATO</text>
+
+        <!-- ── ARMS ── -->
+        <!-- Left arm (raised, holding bag of chips) -->
+        <path d="M168 360 Q148 340 136 310 Q124 276 130 250 Q136 240 148 244 Q158 248 164 268 Q170 288 172 314 L180 360Z" fill="url(#skinGrad2)"/>
+        <!-- left arm sleeve -->
+        <path d="M168 360 Q150 342 140 316 Q130 288 132 258 L148 244 Q136 240 128 252 Q122 276 134 310 Q148 342 168 360Z" fill="url(#jacketGrad)"/>
+        <!-- left arm jacket red stripe -->
+        <path d="M138 316 Q130 290 132 258 L136 260 Q134 290 142 318Z" fill="url(#jacketAccent)" opacity=".7"/>
+
+        <!-- Right arm (relaxed, slightly out) -->
+        <path d="M334 358 Q356 334 366 308 Q376 278 368 258 Q360 244 348 248 Q338 252 336 272 Q332 292 330 314 L320 360Z" fill="url(#skinGrad2)"/>
+        <!-- right arm sleeve -->
+        <path d="M334 358 Q354 338 364 312 Q374 284 370 256 L348 248 Q360 244 368 258 Q376 278 366 308 Q356 334 334 358Z" fill="url(#jacketGrad)"/>
+        <path d="M366 306 Q374 280 370 258 L366 260 Q370 280 362 308Z" fill="url(#jacketAccent)" opacity=".7"/>
+
+        <!-- ── LEFT HAND holding chip bag ── -->
+        <!-- wrist/hand -->
+        <path d="M128 244 Q122 236 126 228 Q132 220 140 222 Q148 224 150 234 L148 244Z" fill="url(#skinGrad)"/>
+        <!-- chip bag -->
+        <path d="M96 178 Q90 186 88 202 L92 242 Q94 252 104 256 L128 258 Q140 256 144 244 L148 212 Q148 198 140 188 Q130 176 118 174 Q106 172 96 178Z" fill="linear-gradient(135deg,#e8210a,#ff6d00)"/>
+        <!-- chip bag — use rect + clip for gradient fill -->
+        <rect x="88" y="174" width="62" height="86" rx="10"
+          fill="url(#jacketAccent)"/>
+        <!-- bag highlight shine -->
+        <path d="M96 182 Q100 178 108 180 L110 228 Q106 232 96 230Z" fill="rgba(255,255,255,0.18)"/>
+        <!-- bag logo area -->
+        <rect x="92" y="196" width="54" height="40" rx="6" fill="rgba(0,0,0,0.35)"/>
+        <text x="119" y="212" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="11" fill="white" letter-spacing="2">CHITATO</text>
+        <text x="119" y="226" text-anchor="middle" font-family="'Chakra Petch',sans-serif" font-size="7" fill="rgba(255,200,0,0.9)" letter-spacing="1">BEEF BBQ</text>
+        <!-- bag top crinkle -->
+        <path d="M90 186 Q100 180 110 184 Q120 180 130 184 Q140 180 150 186" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none"/>
+
+        <!-- ── RIGHT HAND ── -->
+        <path d="M368 252 Q376 244 374 234 Q370 224 360 222 Q350 222 348 232 L348 248Z" fill="url(#skinGrad)"/>
+        <!-- fingers holding chip -->
+        <path d="M368 244 Q374 236 372 228 L376 230 Q378 240 372 248Z" fill="url(#skinGrad)"/>
+
+        <!-- A chip in right hand -->
+        <ellipse cx="382" cy="228" rx="22" ry="14" fill="#f5c842" transform="rotate(-20,382,228)" opacity=".9" filter="url(#glow)"/>
+        <path d="M365 222 Q378 212 398 218 Q404 228 396 238 Q382 244 368 236Z" fill="#e8a800" opacity=".8" transform="rotate(-20,382,228)"/>
+        <path d="M370 226 Q380 216 394 222" stroke="rgba(200,120,0,0.6)" stroke-width="1" fill="none" transform="rotate(-20,382,228)"/>
+
+        <!-- ── NECK ── -->
+        <path d="M244 344 Q248 334 252 326 L268 326 Q272 334 276 344Z" fill="url(#skinGrad)"/>
+        <!-- neck shadow -->
+        <path d="M248 338 Q252 330 260 328 Q268 330 272 338 L268 344 Q260 346 252 344Z" fill="rgba(0,0,0,0.25)"/>
+
+        <!-- ── HEAD ── -->
+        <!-- Head shape -->
+        <path d="M218 240 Q214 208 220 184 Q228 158 248 146 Q260 140 272 146 Q292 158 300 184 Q306 208 302 240 Q296 268 280 280 Q270 286 260 286 Q250 286 240 280 Q224 268 218 240Z" fill="url(#skinGrad)"/>
+        <!-- face highlight (light from left) -->
+        <path d="M218 232 Q216 208 222 186 Q228 166 242 152 L246 156 Q232 170 228 192 Q222 214 224 238Z" fill="rgba(255,140,80,0.18)"/>
+        <!-- right shadow -->
+        <path d="M302 232 Q304 208 298 186 Q290 162 274 150 L278 148 Q296 162 302 188 Q308 212 304 238Z" fill="rgba(0,0,0,0.18)"/>
+
+        <!-- ── EAR ── -->
+        <path d="M218 236 Q210 230 208 240 Q208 250 216 252 Q220 248 220 240Z" fill="url(#skinGrad2)"/>
+        <path d="M302 236 Q310 230 312 240 Q312 250 304 252 Q300 248 300 240Z" fill="url(#skinGrad2)"/>
+
+        <!-- ── HAIR ── -->
+        <!-- Undercut / fade sides -->
+        <path d="M218 220 Q214 200 220 180 Q228 156 250 144 Q260 140 260 140 Q250 138 240 144 Q222 156 216 182 Q210 206 214 228Z" fill="url(#hairGrad)"/>
+        <path d="M302 220 Q306 200 300 180 Q292 156 272 144 Q262 140 260 140 Q270 138 280 144 Q298 156 304 182 Q310 206 306 228Z" fill="url(#hairGrad)"/>
+        <!-- Top hair — styled quiff swept to right -->
+        <path d="M220 180 Q224 158 240 148 Q252 142 268 144 Q284 148 294 162 Q302 176 300 192 Q290 172 276 164 Q262 158 248 160 Q234 164 224 176Z" fill="url(#hairGrad)"/>
+        <!-- hair highlight / texture -->
+        <path d="M234 164 Q242 156 254 154 Q266 152 278 158 Q286 164 292 174 Q278 166 262 164 Q246 162 234 168Z" fill="rgba(80,30,0,0.5)"/>
+        <!-- hair gloss -->
+        <path d="M238 160 Q248 152 262 152 L260 156 Q248 156 240 164Z" fill="rgba(255,255,255,0.08)"/>
+
+        <!-- ── FACE FEATURES ── -->
+        <!-- Eyebrows — angular, expressive -->
+        <path d="M232 202 Q238 196 248 198 Q242 200 238 206Z" fill="#1a0800"/>
+        <path d="M272 198 Q282 196 288 202 L284 206 Q280 200 272 198Z" fill="#1a0800"/>
+        <!-- Eye sockets shadow -->
+        <ellipse cx="242" cy="212" rx="12" ry="8" fill="rgba(0,0,0,0.12)"/>
+        <ellipse cx="278" cy="212" rx="12" ry="8" fill="rgba(0,0,0,0.12)"/>
+        <!-- Eyes — confident squint -->
+        <path d="M232 210 Q242 204 252 210 Q242 218 232 210Z" fill="#0a0500"/>
+        <path d="M268 210 Q278 204 288 210 Q278 218 268 210Z" fill="#0a0500"/>
+        <!-- iris -->
+        <circle cx="242" cy="210" r="5" fill="#3d2010"/>
+        <circle cx="278" cy="210" r="5" fill="#3d2010"/>
+        <!-- pupil -->
+        <circle cx="242" cy="210" r="2.5" fill="#0a0500"/>
+        <circle cx="278" cy="210" r="2.5" fill="#0a0500"/>
+        <!-- eye shine -->
+        <circle cx="244" cy="208" r="1.2" fill="rgba(255,255,255,0.7)"/>
+        <circle cx="280" cy="208" r="1.2" fill="rgba(255,255,255,0.7)"/>
+        <!-- eyelid line -->
+        <path d="M232 210 Q242 205 252 210" stroke="#2a1008" stroke-width="1" fill="none"/>
+        <path d="M268 210 Q278 205 288 210" stroke="#2a1008" stroke-width="1" fill="none"/>
+
+        <!-- Nose -->
+        <path d="M256 218 Q258 228 256 234 Q260 236 264 234 Q262 228 264 218" stroke="rgba(0,0,0,0.25)" stroke-width="1.5" fill="none"/>
+        <ellipse cx="253" cy="234" rx="4" ry="2.5" fill="rgba(0,0,0,0.12)"/>
+        <ellipse cx="267" cy="234" rx="4" ry="2.5" fill="rgba(0,0,0,0.12)"/>
+
+        <!-- Mouth — confident smirk -->
+        <path d="M244 248 Q252 256 268 252 Q262 258 252 258 Q244 256 244 248Z" fill="#8a3020"/>
+        <path d="M244 248 Q252 244 268 248" stroke="#6a2010" stroke-width="1.5" fill="none"/>
+        <!-- lip highlight -->
+        <path d="M248 248 Q254 246 262 248" stroke="rgba(255,255,255,0.2)" stroke-width="1" fill="none"/>
+
+        <!-- ── EXPRESSION LINES / CHARACTER DETAIL ── -->
+        <!-- cheekbone highlight -->
+        <path d="M226 228 Q228 234 226 240" stroke="rgba(255,140,80,0.2)" stroke-width="3" fill="none"/>
+        <path d="M294 228 Q292 234 294 240" stroke="rgba(255,140,80,0.2)" stroke-width="3" fill="none"/>
+
+        <!-- ── CINEMATIC LIGHT overlay on body ── -->
+        <path d="M168 360 Q180 420 190 480 L200 498 L150 498 Q146 460 150 430 Q155 390 168 360Z" fill="url(#lightL)" opacity=".6"/>
+
+        <!-- ── JACKET DETAILS / TEXTURE LINES ── -->
+        <path d="M200 370 Q195 400 196 430" stroke="rgba(255,80,0,0.08)" stroke-width="1" fill="none"/>
+        <path d="M316 372 Q320 402 318 432" stroke="rgba(255,80,0,0.08)" stroke-width="1" fill="none"/>
+
+      </g>
+    </svg>
+  </div>
+
+  <!-- Floating chip shapes left -->
+  <div class="chip-graphic-2">
+    <svg viewBox="0 0 170 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="chipG1" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#ffe066"/>
+          <stop offset="60%" stop-color="#f5a623"/>
+          <stop offset="100%" stop-color="#c87000"/>
+        </radialGradient>
+        <filter id="chipShadow">
+          <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <g filter="url(#chipShadow)">
+        <path d="M14 54 Q6 40 12 24 Q20 8 38 6 Q60 4 84 20 Q110 36 128 62 Q148 90 144 112 Q140 130 122 134 Q100 138 76 124 Q50 110 30 88 Q16 72 14 54Z" fill="url(#chipG1)"/>
+        <path d="M18 52 Q12 38 18 24 Q26 10 42 10 Q64 10 86 26" stroke="rgba(200,120,0,0.4)" stroke-width="2" fill="none"/>
+        <path d="M20 60 Q50 78 90 88 Q120 96 138 108" stroke="rgba(200,120,0,0.3)" stroke-width="1.5" fill="none"/>
+        <path d="M14 56 Q30 42 58 36 Q86 30 112 46 Q130 58 138 76" stroke="rgba(255,200,0,0.25)" stroke-width="1.5" fill="none"/>
+        <path d="M16 46 Q24 34 38 28 L42 32 Q28 38 22 50Z" fill="rgba(255,255,255,0.22)"/>
+        <path d="M126 62 Q140 82 140 104 L136 106 Q136 86 124 66Z" fill="rgba(0,0,0,0.12)"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Floating chip shapes right -->
+  <div class="chip-graphic">
+    <svg viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="chipG2" cx="40%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffd04a"/>
+          <stop offset="55%" stop-color="#e8940a"/>
+          <stop offset="100%" stop-color="#a85c00"/>
+        </radialGradient>
+        <filter id="cs2"><feDropShadow dx="-3" dy="5" stdDeviation="6" flood-color="rgba(0,0,0,0.45)"/></filter>
+      </defs>
+      <g filter="url(#cs2)">
+        <path d="M16 70 Q8 50 18 30 Q30 10 54 8 Q84 6 114 26 Q148 48 170 82 Q192 116 186 142 Q180 158 158 158 Q130 158 100 140 Q68 120 42 96 Q22 80 16 70Z" fill="url(#chipG2)"/>
+        <path d="M22 68 Q16 48 26 30 Q38 12 60 12 Q88 12 116 32" stroke="rgba(200,130,0,0.4)" stroke-width="2.5" fill="none"/>
+        <path d="M22 78 Q60 100 110 114 Q148 124 172 138" stroke="rgba(180,110,0,0.3)" stroke-width="2" fill="none"/>
+        <path d="M18 60 Q48 44 86 40 Q120 36 150 54 Q170 68 178 90" stroke="rgba(255,220,60,0.2)" stroke-width="2" fill="none"/>
+        <path d="M18 60 Q28 44 46 36 L52 42 Q34 50 26 66Z" fill="rgba(255,255,255,0.25)"/>
+        <path d="M164 82 Q180 108 178 136 L172 138 Q174 112 160 88Z" fill="rgba(0,0,0,0.14)"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Flavor callout badge -->
+  <div class="flavor-callout">
+    <div class="callout-inner">
+      <span class="callout-label">NEW</span>
+      <span class="callout-flavor">BEEF<br>BBQ</span>
+      <span class="callout-label">FLAVOR</span>
+    </div>
+  </div>
+
+  <!-- Star badge left -->
+  <div class="star-badge">
+    <svg viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M42 4 L50 30 L78 30 L56 46 L64 72 L42 56 L20 72 L28 46 L6 30 L34 30 Z" fill="rgba(255,180,0,0.15)" stroke="rgba(255,140,0,0.5)" stroke-width="1.5"/>
+      <text x="42" y="38" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="11" fill="rgba(255,200,0,0.9)" letter-spacing="1">CRISPY</text>
+      <text x="42" y="50" text-anchor="middle" font-family="'Chakra Petch',sans-serif" font-size="7" font-weight="700" fill="rgba(255,160,0,0.8)" letter-spacing="1">100%</text>
+    </svg>
+  </div>
+
+  <!-- Info strip -->
+  <div class="info-strip">
+    <div class="info-item">
+      <span class="info-num">7+</span>
+      <span class="info-label">Bold Flavors</span>
+    </div>
+    <div class="info-item">
+      <span class="info-num">35g</span>
+      <span class="info-label">Per Pack</span>
+    </div>
+    <div class="info-item">
+      <span class="info-num">0%</span>
+      <span class="info-label">Trans Fat</span>
+    </div>
+    <div class="info-item">
+      <span class="info-num">#1</span>
+      <span class="info-label">Indonesia</span>
+    </div>
+  </div>
+
+  <!-- Slogan + CTA -->
+  <div class="slogan-block">
+    <p class="slogan-line">Every bite is a <span>bold adventure</span> — never stop snacking</p>
+    <button class="cta-btn">
+      <span class="cta-text">Grab Your Chitato Now</span>
+      <svg class="cta-arrow" viewBox="0 0 20 20" fill="none">
+        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar"></div>
+
+  <!-- Scanlines subtle -->
+  <div class="scanlines"></div>
+
+</div>
+
+</body>
+</html>
